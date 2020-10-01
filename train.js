@@ -1,8 +1,8 @@
 class Train {
     constructor() {
-        this.r = 75;
-        this.l = 50;
-        this.h = 35;
+        this.r = 150;
+        this.l = 40;
+        this.h = 10;
         this.x = width;
         this.y = height - this.l - this.h; 
         this.vx = random(-6,-9);
@@ -14,5 +14,6 @@ class Train {
 
     show() {
         image(sImg, this.x, this.y, this.r, this.l);
+        // rect(this.x, this.y, this.r, this.l)
     }
 }

@@ -3,26 +3,60 @@ let cImg;
 let sImg;
 let mImg;
 let bImg;
+let cupImg;
+let cdownImg;
 let trains = [];
 let counter = 0;
 let score = 0;
+let classifier;
+let label;
+let gameOver;
+const options = { probabilityThreshold: 0.7 } ;
 
 function preload() {
-    cImg = loadImage('catstill.png');
-    sImg = loadImage('sushi.png');
+    cImg = loadImage('catrun.gif');
+    cupImg = loadImage('runningcat12.png');
+    cdownImg = loadImage('runningcat4.png');
+    sImg = loadImage('puddle.png');
     bImg = loadImage('roughbackground.png');
-    mImg = loadImage('strawberry.png')
+    mImg = loadImage('strawberry.png');
+    //classifier = ml5.soundClassifier('SpeechCommands18w', options);
+    classifier = ml5.soundClassifier('https://storage.googleapis.com/tm-model/VFFRe9SWK/model.json', options);
 }
 
 function setup() {
-    createCanvas(800, 450);
-    unicorn = new Unicorn();
-    restart = createButton('Play Again');
+    classifyAudio();
+    createCanvas(960, 540);
+    unicorn = new Cat();
+    // restart = createButton('Play Again');
+}
+
+function classifyAudio() {
+    // while (!classifier.classify){
+    //     setTimeout(() => {}, 0);
+    // }
+    setTimeout(() => classifier.classify(gotResults), 5000);
+    // classifier.classify(gotResults);
+}
+
+function gotResults(error, results) {
+    if (error) {
+        console.error(error);
+        return;
+    }
+    label = results[0].label;
 }
 
 function replay() {
     trains = [];
     loop();
+}
+
+function mousePressed() {
+    if (gameOver){
+        replay();
+        //puddle disappears when I click :(
+    }
 }
 
 function keyPressed() {
@@ -34,19 +68,23 @@ function keyPressed() {
 function draw() {
 
     background(bImg);
+    gameOver = false;
 
     textSize(25);
             fill(0, 102, 153, 100);
-            text('Score ', 50, 60);    
+            text('Score ', 30, 80);    
         textSize(25);
             fill(0, 102, 153, 100);
             score = counter * 10;
-            text(score, 130, 60);
+            text(score, 100, 80);
 
     let separation = false;
 
+    unicorn.show();
+    unicorn.move();
+
     for (let t of trains){
-        if (t.x > width - 400)
+        if (t.x > width - 500)
         {
             separation = true;
         }
@@ -55,19 +93,23 @@ function draw() {
         trains.push(new Train());
     }
 
-    unicorn.show();
-    unicorn.move();
-
     for (let t of trains) {
         t.show();
         t.move();
     if (unicorn.hits(t)) {
-            textSize(50);
-            fill(0, 102, 153, 51);
-            text('Game Over', 250, 200);
+            textSize(75);
+            fill(0, 102, 153, 100);
+            text('Game Over', 300, 200);
+            textSize(35);
+            fill(0, 102, 153, 75);
+            text('Score:', 410, 250);
+            text(score, 520, 250);
+            text('Press anywhere to play again', 275, 300);
+            gameOver = true;
             noLoop();
-            restart.mousePressed(replay);
             counter = 0;
+            cnv.mousePressed(replay);
+            // restart.keyPressed(replay);
         } 
     }
 
